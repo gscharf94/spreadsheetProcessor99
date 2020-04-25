@@ -74,7 +74,7 @@ class Handler():
 		# print(newName)
 		return newName
 
-	def getPotentialCombinations(name):
+	def getPotentialCombinations(self,name):
 		initialName = name
 		potentialNames = [name]
 		name = name.replace(".","")
@@ -133,18 +133,32 @@ class Handler():
 	def addDicts(self):
 		c = 0
 		for name in self.extraDict:
+			couldNotFind = []
 			rows = self.mainDict[name]
 			responses = self.extraDict[name]
 			for response in responses:
 				name = self.convertName(response[0])
 				for x,row in enumerate(rows):
-					if row[1] == name:
+					if row[1] == name and len(row)==8:
+						if row[1] == 'Rodriguez, Maria':
+							print(row)
 						# print(f'found match {row[1]} - {name}')
 						c+= 1
 						row.append(response[1])
 						break
 					if x == len(rows)-1:
-						print(f'WE COULD NOT FIND {response[0]} -> {name}')
+						# print(f'WE COULD NOT FIND {name} (original {response[0]}')
+						couldNotFind.append(response)
+			for chunk in couldNotFind:
+				print(chunk)
+				for x,row in enumerate(rows):
+					potentialNames = self.getPotentialCombinations(chunk[0])
+					for pot in potentialNames:
+						if pot == row[1]:
+							# print('found match for impossible')
+							c += 1
+							row.append(response[1])
+							break
 		# print(self.mainDict)
 		print(c)
 
@@ -169,11 +183,12 @@ class Handler():
 		print(self.mainDict['Abreu, Rosaura'])
 
 
-
-
-
 handler = Handler('4-24-2020.xlsx')
 # handler.getRecordsFromSheet('Abreu, Rosaura')
 handler.initMainDict()
 handler.initExtraDict()
 handler.addDicts()
+
+import pickle
+
+pickle.dump(handler.mainDict,open('finalDict2.p','wb'))
